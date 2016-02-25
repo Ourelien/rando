@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Rando Lille Metropole</title>
+		<link rel="stylesheet" href="./index.css" />
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+		<link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
+		<link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+		<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+		<script src="http://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+    </head>
+
+    <body>
+		<div id="map"></div>
+		<script type="text/javascript">
+		// Create the map
+var map = L.map('map').setView([50.633333, 3.066667], 11);
+
+// Set up the OSM layer
+L.tileLayer(
+    'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18
+}).addTo(map);
+
+var markers = new L.MarkerClusterGroup();
+
+markers.addLayer(new L.Marker([50.5853979382664, 3.10181169770658]));
+markers.addLayer(new L.Marker([50.58548, 3.105843]));
+markers.addLayer(new L.Marker([50.55777403526008, 3.175677973777056]));
+markers.addLayer(new L.Marker([50.67988, 3.2480503]));
+markers.addTo(map);
+
+var geoJsonList = new Array()
+
+function clean_map() {
+    map.eachLayer(function (layer) {
+        if (layer instanceof L.GeoJSON)
+        {
+        	map.removeLayer(layer);
+          console.log("did");
+        }
+        console.log(layer);
+    });
+}
+
+map.on('zoomend', function (e) {
+    zoom_based_layerchange();
+    console.log(map.getZoom());
+});
+
+function zoom_based_layerchange() {
+    //console.log(map.getZoom());
+    var currentZoom = map.getZoom();
+    if(currentZoom < 12){
+            clean_map();
+    } else {
+    	for	(index = 0; index < geoJsonList.length; index++) {
+        geoJsonList[index].addTo(map)
+			}
+    }
+}
+
+function loadGeoJsonSucces(response){
+	var geojsonLayer = L.geoJson(response,
+        	{
+          		onEachFeature: function (feature, layer) {
+  	          	layer.bindPopup(feature.properties.name) 
+	           	}
+          }
+        )//.addTo(map);
+        geoJsonList.push(geojsonLayer)
+}
+
+$.ajax({
+    type: "POST",
+    url: 'https://gist.githubusercontent.com/anonymous/4692aa57637a15f2c78b/raw/721f3ce94f1b3761e6ccb299fd19bba08d6142d2/geojson.json',
+    dataType: 'json',
+    success: function (response) {
+			loadGeoJsonSucces(response)
+    }
+});
+
+
+$.ajax({
+    type: "POST",
+    url: 'https://gist.githubusercontent.com/anonymous/959573620d42dc429001/raw/d2417a702617afc5469bf59a46d36994bc05ad6e/geojson.json',
+    dataType: 'json',
+    success: function (response) {
+    		loadGeoJsonSucces(response)
+    }
+});
+
+$.ajax({
+    type: "POST",
+    url: 'https://gist.githubusercontent.com/anonymous/cf6f99abb8298caed204/raw/88cb4a3c1afb309b4c38068ee2dc59c5f7d20836/geojson.json',
+    dataType: 'json',
+    success: function (response) {
+        loadGeoJsonSucces(response)
+    }
+});
+
+$.ajax({
+    type: "POST",
+    url: 'https://gist.githubusercontent.com/anonymous/cad448fe912f43a9c854/raw/e5d05e41e51ce41d177d1a49a656d17c27f9f3a6/geojson.json',
+    dataType: 'json',
+    success: function (response) {
+    	loadGeoJsonSucces(response)
+    }
+});
+/*
+			// Create the map
+			var map = L.map('map').setView([51.505, -0.09], 13);
+			// Set up the OSM layer
+			L.tileLayer(
+				'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				maxZoom: 18
+			}).addTo(map);
+			
+			//Ajout de markervar markers = [];
+			var marker1 = L.marker([51.497, -0.09],{title:"marker_1"}).addTo(map).bindPopup("Marker 1");
+			markers.push(marker1);
+			var marker2 = L.marker([51.495, -0.083],{title:"marker_2"}).addTo(map).bindPopup("Marker 2");
+			markers.push(marker2);
+			var marker3 = L.marker([51.49, -0.097],{title:"marker_3"}).addTo(map).bindPopup("Marker 3");
+			markers.push(marker3);
+	*/		
+			
+			
+		</script>
+    </body>
+</html>
